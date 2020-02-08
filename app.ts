@@ -42,7 +42,7 @@ app.get("/", function(req: Request, res: Response): void {
 
 const { PORT, DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_DATABASE } = process.env;
 
-const db = pgp({
+export const db = pgp({
   user: DB_USER,
   password: DB_PASS,
   host: DB_HOST,
