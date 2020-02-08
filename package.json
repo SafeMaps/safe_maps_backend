@@ -4,7 +4,7 @@
   "description": "A web-mapping service that uses statistical crime data from NYC to get you to your destination using the safest routes available.",
   "main": "app.js",
   "scripts": {
-    "test": "mocha ts-built/tests/**.spec.js",
+    "test": "mocha ts-built/tests/**.spec.js --exit",
     "tsc-watch": "tsc --watch --outDir ts-built/",
     "tsc": "tsc"
   },
