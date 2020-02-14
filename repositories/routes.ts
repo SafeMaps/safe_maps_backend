@@ -1,7 +1,7 @@
 /**
  * @fileOverview Repository for routing actions.
  * @author Patrick Vanegas
- * @version 1.0.0
+ * @version 1.0.1
  */
 import axios from 'axios';
 import * as dotenv from "dotenv";
@@ -22,6 +22,13 @@ export declare interface IReturnGeoCoordinates {
   readonly longitude: number,
 }
 
+declare interface IAreasToAvoid {
+  readonly topLeftLatitude: number,
+  readonly topLeftLongitude: number,
+  readonly bottomRightLatitude: number,
+  readonly bottomRightLongitude: number,
+}
+
 
 const { SAFE_MAPS_API_KEY } = process.env;
 
@@ -34,16 +41,27 @@ export class RouteRepository {
    * Obtains a desired route from the HERE Maps API given source and destination geolocation objects.
    * @param {IRequestGeoCoordinates} source An object containing the geoposition of the source address
    * @param {IRequestGeoCoordinates} destination An object containing the geoposition of the destination address
+   * @param {Array<IAreasToAvoid>} areasToAvoid An array containing the rectangular regions that the routing API should avoid
    * @returns {Array<IReturnGeoCoordinates>} An Array of coordinates that define the obtained route itself
    */
-  public async getRoute(source: IRequestGeoCoordinates, destination: IRequestGeoCoordinates): Promise<Array<IReturnGeoCoordinates>> {
+  public async getRoute(source: IRequestGeoCoordinates, destination: IRequestGeoCoordinates, areasToAvoid?: Array<IAreasToAvoid>): Promise<Array<IReturnGeoCoordinates>> {
     const sourceLatitude: number = <number>parseFloat(source.latitude);
     const sourceLongitude: number = <number>parseFloat(source.longitude);
     const destinationLatitude: number = <number>parseFloat(destination.latitude);
     const destinationLongitude: number = <number>parseFloat(destination.longitude);
 
     const routeCoordinates: Array<IReturnGeoCoordinates> = [];
-    const routeEndpoint: string = <string>`https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=${SAFE_MAPS_API_KEY}&waypoint0=geo!${sourceLatitude},${sourceLongitude}&waypoint1=geo!${destinationLatitude},${destinationLongitude}&mode=fastest;bicycle;traffic:disabled&legAttributes=shape`;
+    let routeEndpoint: string = <string>`https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=${SAFE_MAPS_API_KEY}&waypoint0=geo!${sourceLatitude},${sourceLongitude}&waypoint1=geo!${destinationLatitude},${destinationLongitude}&mode=fastest;bicycle;traffic:disabled&legAttributes=shape`;
+
+    if (areasToAvoid !== undefined) {
+      routeEndpoint += '&avoidareas=';
+
+      if (areasToAvoid.length > 1) {
+        areasToAvoid.forEach((point, index) => {
+          routeEndpoint += `${point.topLeftLatitude}, ${point.topLeftLongitude};${point.bottomRightLatitude}, ${point.bottomRightLongitude}${index !== areasToAvoid.length - 1 ? '!' : ""}`;
+        });
+      }
+    }
 
     try {
       const res = await axios.get(routeEndpoint);
