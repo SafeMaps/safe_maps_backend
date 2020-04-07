@@ -57,11 +57,14 @@ app.use(
       { url: '/health', methods: ['GET'] },
       { url: '/users', methods: ['POST', 'GET'] },
       { url: '/routes', methods: ['GET'] },
+      { url: '/users/signup', methods: ['POST'] },
+      { url: '/users/signin,', methods: ['GET'] },
     ],
   })
 );
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
+  console.log(err)
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('invalid token...');
   }
