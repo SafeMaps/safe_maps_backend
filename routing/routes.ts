@@ -7,7 +7,7 @@ import { Router } from 'express';
 export function routesRouting(db: string, secret: number): Router {
   const routesRepository = new RouteRepository(db, secret);
 
-  router.get("/routes", 
+  router.post("/routes",
     routesHandler.coordinatesValidation, 
     routesHandler.getRoute(routesRepository)
   );

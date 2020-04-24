@@ -55,16 +55,15 @@ app.use(
     path: [
       { url: '/auth', methods: ['POST'] },
       { url: '/health', methods: ['GET'] },
-      { url: '/users', methods: ['POST', 'GET'] },
-      { url: '/routes', methods: ['GET'] },
+      { url: '/routes', methods: ['POST'] },
       { url: '/users/signup', methods: ['POST'] },
-      { url: '/users/signin,', methods: ['GET'] },
+      { url: '/users/login', methods: ['GET'] },
     ],
   })
 );
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-  console.log(err)
+  console.log(err);
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('invalid token...');
   }

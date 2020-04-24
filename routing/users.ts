@@ -7,13 +7,13 @@ import { Router } from 'express';
 export function usersRouting(db: string, secret: number): Router {
   const userRepository = new UserRepository(db, secret);
 
-  router.post("/users/signup", 
+  router.post("/users/signup",
     usersHandler.createAccountValidation, 
     usersHandler.createAccount(userRepository)
   );
 
-  router.get("/users/signin", 
-    usersHandler.authenticateAccountValidation, 
+  router.get("/users/login",
+    usersHandler.authenticateAccountValidation,
     usersHandler.authenticateAccount(userRepository)
   );
 
