@@ -63,7 +63,6 @@ app.use(
 );
 
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
-  console.log(err);
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('invalid token...');
   }

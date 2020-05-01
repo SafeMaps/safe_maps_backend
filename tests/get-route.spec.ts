@@ -1,7 +1,7 @@
 'use strict'
 
 const exp = require('chai').expect
-import { RouteRepository, IRequestGeoCoordinates } from '../repositories/routes';
+import { RouteRepository, IGeoCoordinates } from '../repositories/routes';
 import config from '../config';
 import { db } from '../app';
 
@@ -11,17 +11,17 @@ describe('getRoute() successfully obtains route coordinates for a given source a
 
       const mockData = {
         source: {
-          latitude: "52.5",
-          longitude: "13.4",
+          latitude: 52.5,
+          longitude: 13.4,
         },
         destination: {
-          latitude: "52.5",
-          longitude: "13.45",
+          latitude: 52.5,
+          longitude: 13.45,
         }
       }
 
-      const source: IRequestGeoCoordinates = mockData.source;
-      const destination: IRequestGeoCoordinates = mockData.destination;
+      const source: IGeoCoordinates = mockData.source;
+      const destination: IGeoCoordinates = mockData.destination;
 
       const response = await routeRepository.getRoute(source, destination);
       exp(response).to.be.an('array').that.is.not.empty

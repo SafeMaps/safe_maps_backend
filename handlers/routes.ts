@@ -5,7 +5,7 @@
 */
 import { Request, Response } from 'express';
 import { RouteRepository } from '../repositories';
-import { IReturnGeoCoordinates, IRequestGeoCoordinates } from '../repositories/routes';
+import { IGeoCoordinates, IReturnRouteAndAreasToAvoid } from '../repositories/routes';
 import { celebrate, Joi } from 'celebrate';
 
 export = RouteHandler;
@@ -22,12 +22,12 @@ namespace RouteHandler {
   export const coordinatesValidation = celebrate({
     body: Joi.object({
       source: Joi.object({
-        latitude: Joi.string(),
-        longitude: Joi.string(),
+        latitude: Joi.number(),
+        longitude: Joi.number(),
       }),
       destination: Joi.object({
-        latitude: Joi.string(),
-        longitude: Joi.string(),
+        latitude: Joi.number(),
+        longitude: Joi.number(),
       }),
     }),
   });
@@ -39,17 +39,18 @@ namespace RouteHandler {
    */
   export function getRoute(routeRepository: RouteRepository) : Function {
     return async function (req: Request, res: Response) : Promise<void> {
-      const source: IRequestGeoCoordinates = <IRequestGeoCoordinates>req.body.source;
-      const destination: IRequestGeoCoordinates = <IRequestGeoCoordinates>req.body.destination;
+      const source: IGeoCoordinates = <IGeoCoordinates>req.body.source;
+      const destination: IGeoCoordinates = <IGeoCoordinates>req.body.destination;
 
       try {
-        const routeCoordinates: Array<IReturnGeoCoordinates> = await routeRepository.getRoute(source, destination);
-        if (routeCoordinates) {
-          res.status(200).json({ routeCoordinates });
+        const routeInformation: IReturnRouteAndAreasToAvoid = await routeRepository.getRoute(source, destination);
+        if (routeInformation) {
+          res.status(200).json(routeInformation);
           return;
         }
         res.sendStatus(400);
       } catch (error) {
+        console.log(error)
         res.sendStatus(500);
       }
     }
