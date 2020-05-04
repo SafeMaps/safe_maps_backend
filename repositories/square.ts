@@ -6,19 +6,13 @@ declare interface IDimensions {
   width: number,
 }
 
-declare interface ISquareClone {
-  topLeft: IGeoCoordinates,
-  topRight: IGeoCoordinates,
-  bottomRight: IGeoCoordinates,
-  bottomLeft: IGeoCoordinates,
-}
-
 export class Square {
   public topLeft: IGeoCoordinates;
   public topRight: IGeoCoordinates;
   public bottomRight: IGeoCoordinates;
   public bottomLeft: IGeoCoordinates;
   public numOfCrimes?: number | undefined;
+  public active?: boolean | undefined;
 
   /**
    * returns a square computed from two opposing points: (topLeft, bottomRight) and (topRight, bottomLeft) as:
@@ -35,7 +29,7 @@ export class Square {
   /**
    * returns the dimensions (length and width) of the square
    */
-  private getDimensions(): IDimensions {
+  public getDimensions(): IDimensions {
     return <IDimensions>{
       length: this.topLeft.latitude - this.bottomLeft.latitude,
       width: Math.abs(this.topLeft.longitude) - Math.abs(this.topRight.longitude)
@@ -66,16 +60,19 @@ export class Square {
       return <IDimensions>{ length, width };
   }
 
+  isEqual(window: Square): Boolean {
+    const topLeftCheck = this.topLeft.latitude == window.topLeft.latitude && this.topLeft.longitude == window.topLeft.longitude;
+    const topRightCheck = this.topRight.latitude == window.topRight.latitude && this.topRight.longitude == window.topRight.longitude
+    const bottomLeftCheck = this.bottomLeft.latitude == window.bottomLeft.latitude && this.bottomLeft.longitude == window.bottomLeft.longitude
+    const bottomRightCheck = this.bottomRight.latitude == window.bottomRight.latitude && this.bottomRight.longitude == window.bottomRight.longitude
+    return (topLeftCheck && topRightCheck && bottomLeftCheck && bottomRightCheck);
+}
+
   /**
    * returns a copy of the square
    * @returns {Square}
    */
-  clone(): ISquareClone {
-      return <ISquareClone>{
-        topLeft: {...this.topLeft},
-        topRight: {...this.topRight},
-        bottomLeft: {...this.bottomLeft},
-        bottomRight: {...this.bottomRight}
-      }
+  clone(): Square {
+      return (new Square(this.topLeft,this.bottomRight));
   }
 }

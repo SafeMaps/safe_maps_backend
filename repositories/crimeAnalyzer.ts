@@ -1,8 +1,9 @@
 import { IGeoCoordinates } from './routes';
 import { Square } from './square';
+import { Grid } from './grid';
 
 interface IThreshold {
-  readonly [method: string]: number,
+  [method: string]: number,
 }
 
 declare interface IDBSubSquares {
@@ -37,7 +38,6 @@ export class CrimeAnalyzer {
                 AND lower_right_long ${restrictionLong}`;
 
     try {
-        const queryArguments =  ['grid_' + dayOfWeek, bottomLeft.latitude, topLeft.latitude, topLeft.longitude, topRight.longitude];
         return <Promise<Array<IDBSubSquares>>>await this.db.any(q, [true]);
     } 
     catch(e) {
@@ -71,6 +71,9 @@ export class CrimeAnalyzer {
    * @returns {number}
    */
   private getThreshold(dayOfWeek: string): number {
+    const sliderVal = 10;
+    const scaleFactor = sliderVal / 5;
+
     const threshold: IThreshold = {
         all: 911,
         monday: 121,
@@ -81,6 +84,8 @@ export class CrimeAnalyzer {
         saturday: 138,
         sunday: 117
     }
+
+    Object.keys(threshold).forEach(day => threshold[day] *= scaleFactor);
     return <number>threshold[dayOfWeek];
   }
 
@@ -136,6 +141,8 @@ export class CrimeAnalyzer {
     const queriedSquare = this.getQueriedSquareWithOffset(bigSquare);
     const squares = await this.getQueriedSubSquares(queriedSquare, dayOfWeek);
     const grid = this.castSquares(squares);
-    return this.getActivatedWindows(grid, dayOfWeek).sort(this.compareWindows).reverse().slice(0,20);
+    let newGrid = new Grid(this.getActivatedWindows(grid, dayOfWeek));
+    newGrid.maximumRectangles();
+    return newGrid.postGrid.sort(this.compareWindows).reverse().slice(0,20);
   }
 }
